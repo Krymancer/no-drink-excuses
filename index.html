@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Não vou beber hoje</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS for the typing animation cursor */
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+        .typing-cursor {
+            border-right: 2px solid theme('colors.purple.200');
+            animation: blink 1s step-end infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4 font-inter">
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl text-center">
+        <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-6">
+            Não vou beber hoje, porque:
+        </h1>
+        
+        <div id="display-area" class="bg-gray-700 text-purple-200 text-3xl font-bold py-4 px-4 rounded-lg mb-8 h-32 flex items-center justify-center transition-all duration-300 ease-in-out transform">
+            Não quero!
+        </div>
+                
+        <button id="generate-btn" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:from-purple-600 hover:to-pink-600 focus:outline-none focus:ring-4 focus:ring-purple-300 transition-transform duration-200 transform hover:scale-105">
+            Errr...
+        </button>
+    </div>
+
+    <script>        
+        const phrases = [
+            "Não posso, estou gravido.",
+            "Tô tomando bomba, ai corta o efeito.",
+            `Só bebo em dia ${(new Date().getDay())%2 === 0 ? 'ímpar' : 'par'}.`,
+            "Não tenho mulher nem filho, vou bater em quem quando chegar em casa?",
+            "Dei em cima do meu médico e ele disse pra eu parar de beber.",
+            "Sou passarinho, dessa agua não bebo.",
+            "Tive um imprevisto (sou pau mandado)",
+            "Vou dormir (to liso)",
+            "Não posso vou dirigir, tenho que abraçar o poste.",
+            "Vai cancelar o efeito do meu tadala.",
+        ];
+
+        // Get references to the HTML elements
+        const generateBtn = document.getElementById('generate-btn');
+        const displayArea = document.getElementById('display-area');
+
+        // Character set for scrambling, including letters, numbers, and symbols.
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        // Main function to start the animation
+        function selectRandomPhrase() {
+            // Disable the button during animation to prevent multiple clicks
+            generateBtn.disabled = true;
+
+            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            const phraseLength = randomPhrase.length;
+            const scrambleDuration = 500; // Duration each character scrambles for in ms
+            const frameRate = 30; // Animation frames per second
+            
+            // Create a state object for each character to track its animation
+            const charStates = randomPhrase.split('').map((char, index) => ({
+                char,
+                isFinal: false,
+                lockTime: Date.now() + Math.random() * scrambleDuration
+            }));
+
+            // Clear the display area and add the typing cursor effect
+            displayArea.textContent = '';
+            displayArea.classList.add('typing-cursor');
+
+            // Set up a single interval to update all characters in parallel
+            const animationInterval = setInterval(() => {
+                const now = Date.now();
+                let allFinal = true;
+
+                // Create the new string to display
+                const newDisplayString = charStates.map(state => {
+                    // Check if the character should be locked in place
+                    if (now >= state.lockTime && !state.isFinal) {
+                        state.isFinal = true;
+                    }
+                    
+                    // If locked, return the correct character. Otherwise, return a random one.
+                    if (state.isFinal) {
+                        return state.char;
+                    } else {
+                        allFinal = false;
+                        // Handle spaces specifically; they don't scramble.
+                        if (state.char === ' ') {
+                            return ' ';
+                        }
+                        return chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                }).join('');
+
+                displayArea.textContent = newDisplayString;
+
+                // If all characters are final, end the animation
+                if (allFinal) {
+                    clearInterval(animationInterval);
+                    displayArea.classList.remove('typing-cursor');
+                    generateBtn.disabled = false;
+                }
+            }, 1000 / frameRate);
+        }
+
+        // Add a click event listener to the button
+        generateBtn.addEventListener('click', selectRandomPhrase);
+    </script>
+</body>
+</html>
